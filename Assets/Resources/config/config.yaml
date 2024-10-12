@@ -1,0 +1,88 @@
+behaviors:
+  BilliyardBehavior:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 64               # Batch size for gradient update
+      buffer_size: 2048            # Buffer size, since the agent makes decisions episodically, the buffer can be slightly larger than one episode
+      learning_rate: 3.0e-4        # Learning rate
+      beta: 5.0e-4                 # Entropy regularization coefficient to improve exploration
+      epsilon: 0.2                 # Coefficient that defines the policy change boundaries (PPO clip parameter)
+      lambd: 0.95                  # Parameter for Generalized Advantage Estimation (GAE)
+      num_epoch: 3                 # Number of epochs for network update
+      learning_rate_schedule: linear # Linear decay of the learning rate
+
+    network_settings:
+      hidden_units: 512            # Number of neurons in the hidden layers
+      num_layers: 3                # Number of hidden layers
+
+    reward_signals:
+      extrinsic:
+        gamma: 0.99                # Discount factor for future rewards
+        strength: 1.0              # Reward weight
+
+    max_steps: 50000000              # Total number of training steps
+    time_horizon: 128              # Time horizon for reward estimation
+    summary_freq: 10000            # Frequency of recording training statistics
+    keep_checkpoints: 5            # Number of checkpoints to keep
+
+environment_parameters:
+  hit_reward:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.6
+        value: 0.7
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.65
+        value: 0.5
+      - name: Lesson2
+        value: 0.3
+  drop_reward:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.6
+        value: 0.0
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.65
+        value: 0.3
+      - name: Lesson2
+        value: 0.5
+  penalty_reward:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.6
+        value: 0.0
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.65
+        value: 0.3
+      - name: Lesson2
+        value: 0.5

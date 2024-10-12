@@ -1,0 +1,107 @@
+behaviors:
+  BilliyardBehavior:
+    # トレーナー種別
+    trainer_type: ppo # ppo(オンポリシー) or sac(オフポリシー)
+    
+    # ハイパーパラメータ
+    hyperparameters:
+        
+      # PPO、SAC共通
+      batch_size: 512                 # 勾配降下(適正な値に近づける)の更新1回に使用される経験の数 (Continuousの場合は大きな数、Discreteの場合は小さな数の方がよい)
+      buffer_size: 40960               # ポリシーの更新を行う前に収集する経験の数（batch_sizeの倍数でなければならない）
+      learning_rate: 1.0e-4          # 学習率の初期値 (高いほど学習済とみなして結果を信用する)
+      learning_rate_schedule: linear # 学習率をどのように変化させるか (linearは後半になるほど高くし結果を信用する)
+      
+      # PPO固有
+      beta: 5.0e-3             # 行動決定のランダムさ
+      epsilon: 0.2             # 勾配降下のポリシー更新比率に対する許容限界の指定 (低くすると安定するが時間がかかる)
+      lambd: 0.95             # GAEを計算するときに使用する正規化パラメータ
+      num_epoch: 3             # 勾配降下にポリシー更新時に訓練データを学習させる回数 (小さくすると安定するが時間がかかる)
+      beta_schedule: constant  # betaをどのように変化させるか
+      epsilon_schedule: linear # epsilonをどのように変化させるか
+    
+    # ニューラルネットワーク
+    network_settings:
+      normalize: false  # 入力を正規化することで効率をあげるか？
+      hidden_units: 512 # 隠れ層のニューロンの数
+      num_layers: 2     # 隠れ層の数
+    
+    # 報酬シグナル
+    reward_signals:
+      extrinsic:       # 環境によって与えられる報酬
+        gamma: 0.99    # 将来の報酬割引係数 (将来を重視する場合は大きな値を設定)
+        strength: 1.0  # 報酬にどれだけ乗算するか (他の報酬シグナルとの割合を設定)
+
+      curiosity:
+        gamma: 0.99
+        strength: 0.005
+        network_settings:
+          hidden_units: 64
+        learning_rate: 0.0003
+
+    # 基本設定
+    max_steps: 500000000   # 学習するステップ数
+    time_horizon: 128    # 経験バッファに追加する前に収集する経験の数 (頻繁に報酬が与えられる場合は小さな値の方がよい)
+    summary_freq: 10000 # 統計情報の保存頻度となるステップ数
+
+environment_parameters:
+  hit_reward:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.7
+        value: 0.7
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.9
+        value: 0.5
+      - name: Lesson2
+        value: 0.3
+  drop_reward:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.7
+        value: 0.0
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.9
+        value: 0.3
+      - name: Lesson2
+        value: 0.5
+  penalty_reward:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.7
+        value: 0.0
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 10
+          threshold: 0.9
+        value: 0.3
+      - name: Lesson2
+        value: 0.5
