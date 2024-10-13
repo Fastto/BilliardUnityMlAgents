@@ -13,7 +13,7 @@ namespace Billiard
 
         // Config
         private float _waitBeforeShotTime = 2f;
-        private float _collectObservationPeriod = 0.25f;
+        private float _collectObservationPeriod = 0.2f;
         
         // Variables
         private bool _doAction = false;
@@ -31,9 +31,9 @@ namespace Billiard
             EnvironmentParameters envParams = Academy.Instance.EnvironmentParameters;
             _victoryReward = envParams.GetWithDefault("victory_reward", 1.0f);
             _defeatPenalty = envParams.GetWithDefault("defeat_penalty", -1.0f);
-            _legalShotReward = envParams.GetWithDefault("legal_shot_reward", 1f/18f);
+            _legalShotReward = envParams.GetWithDefault("legal_shot_reward", 1f/36f);
             _legalShotBallCaughtReward = envParams.GetWithDefault("legal_shot_ball_caught_reward", 1f/9f);
-            _illegalShotPenalty = envParams.GetWithDefault("illegal_shot_penalty", -1f/18f);
+            _illegalShotPenalty = envParams.GetWithDefault("illegal_shot_penalty", -1f/36f);
         }
 
         public override void OnEpisodeBegin()

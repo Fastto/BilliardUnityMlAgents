@@ -13,7 +13,7 @@ behaviors:
 
     network_settings:
       hidden_units: 512            # Number of neurons in the hidden layers
-      num_layers: 3                # Number of hidden layers
+      num_layers: 2                # Number of hidden layers
 
     reward_signals:
       extrinsic:
@@ -26,7 +26,7 @@ behaviors:
     keep_checkpoints: 5            # Number of checkpoints to keep
 
 environment_parameters:
-  hit_reward:
+  victory_reward:
     curriculum:
       - name: Lesson0
         completion_criteria:
@@ -35,18 +35,14 @@ environment_parameters:
           signal_smoothing: true
           min_lesson_length: 10
           threshold: 0.6
-        value: 0.7
+        value: 0
       - name: Lesson1
-        completion_criteria:
-          measure: reward
-          behavior: BilliyardBehavior
-          signal_smoothing: true
-          min_lesson_length: 10
-          threshold: 0.65
-        value: 0.5
-      - name: Lesson2
-        value: 0.3
-  drop_reward:
+        value: 1
+  defeat_penalty:
+    curriculum:
+      - name: Lesson0
+        value: 0
+  legal_shot_reward:
     curriculum:
       - name: Lesson0
         completion_criteria:
@@ -55,18 +51,10 @@ environment_parameters:
           signal_smoothing: true
           min_lesson_length: 10
           threshold: 0.6
-        value: 0.0
+        value: 0.1
       - name: Lesson1
-        completion_criteria:
-          measure: reward
-          behavior: BilliyardBehavior
-          signal_smoothing: true
-          min_lesson_length: 10
-          threshold: 0.65
-        value: 0.3
-      - name: Lesson2
-        value: 0.5
-  penalty_reward:
+        value: 0.05  
+  legal_shot_ball_caught_reward:
     curriculum:
       - name: Lesson0
         completion_criteria:
@@ -75,14 +63,18 @@ environment_parameters:
           signal_smoothing: true
           min_lesson_length: 10
           threshold: 0.6
-        value: 0.0
+        value: 0.2
       - name: Lesson1
+        value: 0.1  
+  illegal_shot_penalty:
+    curriculum:
+      - name: Lesson0
         completion_criteria:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
           min_lesson_length: 10
-          threshold: 0.65
-        value: 0.3
-      - name: Lesson2
-        value: 0.5
+          threshold: 0.6
+        value: 0.01
+      - name: Lesson1
+        value: 0.1
