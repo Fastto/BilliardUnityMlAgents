@@ -1,0 +1,112 @@
+# =============== #
+# Unity generated #
+# =============== #
+
+# Ignore system generated files
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Icon?
+._*
+
+# Ignore Visual Studio/MonoDevelop files
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+*.ide.*
+
+# Unity specific folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+MemoryCaptures/
+
+# Avoid tracking project-specific personal settings
+[Dd]ebug/
+[Dd]ebugProfile/
+.gradle/
+.settings/
+.idea/
+
+# Asset Bundles
+/[Aa]sset[Bb]undles/
+/[Aa]ddressables[Aa]sset[Bb]undles/
+/[Aa]ssets/[Ss]treaming[Aa]ssets/
+
+# Ignore Crashlytics auto-generated files
+fabric/com.crashlytics.*
+
+# Uncomment if you have plugins to store the NDK.
+/[Aa]ssets/Plugins/Android/gradle.properties
+
+# Avoid including auto-generated lighting data
+/[Ll]ighting[Dd]ata[Aa]sset
+
+# Exclude builds folder if you create builds in the project directory
+/[Bb]uild/
+
+# Ignore the rest of Unity's temp files
+/[Aa]ssets/Generated/AddressableAssetsData/
+
+# ========== #
+# Rider IDE  #
+# ========== #
+
+# Ignore Rider project files and folder
+.idea/
+.idea/*
+
+# Ignore user-specific workspace configurations
+*.sln.iml
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+
+# Ignore Rider's logs, caches, and external annotations
+.idea/.idea.log/
+.idea/caches/
+.idea/encodings.xml
+.idea/external_annotations.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/php.xml
+.idea/runConfigurations/
+.idea/codeStyles/
+.idea/jsLibraryMappings.xml
+.idea/scopes/
+
+# Ignore user preferences in Rider
+.idea/codeStyleSettings.xml
+.idea/codeStyles/
+.idea/gradle.xml
+
+# Rider-specific code styles and inspection settings
+.idea/.idea.code.style.xml
+.idea/.idea.inspections.xml
+.idea/.idea.run.xml
+.idea/.idea.workspace.xml
+.idea/.idea.target.riderFiles.xml
+.idea/.idea.tasks.xml
+.idea/.idea.tasks.local.xml
+
+# Rider tool specific files
+.rider/
