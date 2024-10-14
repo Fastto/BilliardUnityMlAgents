@@ -2,8 +2,8 @@ behaviors:
   BilliyardBehavior:
     trainer_type: ppo
     hyperparameters:
-      batch_size: 256               # Batch size for gradient update
-      buffer_size: 4096            # Buffer size, since the agent makes decisions episodically, the buffer can be slightly larger than one episode
+      batch_size: 256              # Batch size for gradient update
+      buffer_size: 1024            # Buffer size, since the agent makes decisions episodically, the buffer can be slightly larger than one episode
       learning_rate: 3.0e-4        # Learning rate
       beta: 5.0e-4                 # Entropy regularization coefficient to improve exploration
       epsilon: 0.2                 # Coefficient that defines the policy change boundaries (PPO clip parameter)
@@ -20,12 +20,107 @@ behaviors:
         gamma: 0.99                # Discount factor for future rewards
         strength: 1.0              # Reward weight
 
-    max_steps: 50000000              # Total number of training steps
-    time_horizon: 512              # Time horizon for reward estimation
-    summary_freq: 10000            # Frequency of recording training statistics
+    max_steps: 50000000            # Total number of training steps
+    time_horizon: 32               # Time horizon for reward estimation
+    summary_freq: 1000            # Frequency of recording training statistics
     keep_checkpoints: 5            # Number of checkpoints to keep
 
-environment_parameters:
+
+
+environment_parameters:    
+  # 0 - game, 1 - center
+  white_ball_starting_pos:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: 1 
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: 1
+      - name: Lesson2
+        value: 0
+
+  balls_starting_pos:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: 1
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: 2
+      - name: Lesson2
+        value: 0
+
+  target_mode:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: 1
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: 1
+      - name: Lesson2
+        value: 0
+
+  only_one_attempt:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: 1
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: 1
+      - name: Lesson2
+        value: 0
+
   victory_reward:
     curriculum:
       - name: Lesson0
@@ -33,15 +128,22 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 10
-          threshold: 0.6
-        value: 0
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: 0.0
       - name: Lesson1
-        value: 1
-  defeat_penalty:
-    curriculum:
-      - name: Lesson0
-        value: 0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: 0.0
+      - name: Lesson2
+        value: 1.0
+
   legal_shot_reward:
     curriculum:
       - name: Lesson0
@@ -49,11 +151,22 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 10
-          threshold: 0.6
-        value: 0.1
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: 1.0
       - name: Lesson1
-        value: 0.05  
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: 0.5
+      - name: Lesson2
+        value: 0.05
+
   legal_shot_ball_caught_reward:
     curriculum:
       - name: Lesson0
@@ -61,11 +174,22 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 10
-          threshold: 0.6
-        value: 0.2
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: 0.0
       - name: Lesson1
-        value: 0.1  
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: 0.5
+      - name: Lesson2
+        value: 0.1
+
   illegal_shot_penalty:
     curriculum:
       - name: Lesson0
@@ -73,8 +197,42 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 10
-          threshold: 0.6
-        value: 0.01
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: -1.0
       - name: Lesson1
-        value: 0.1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: -1.0
+      - name: Lesson2
+        value: -0.1
+
+  defeat_penalty:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: 0.0
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: 0.0
+      - name: Lesson2
+        value: -1.0
+        

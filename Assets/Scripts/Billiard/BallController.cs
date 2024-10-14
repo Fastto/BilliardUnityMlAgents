@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Billiard
@@ -26,9 +27,24 @@ namespace Billiard
         private void OnCollisionEnter(Collision other) {
             if(isWhite_ && FirstHitTargetNum == -1 && other.gameObject.tag == "targetBall")
             {
-                BallController ballController = other.gameObject.GetComponent<BallController>();
+                BallController ballController = other.transform.GetComponent<BallController>();
                 FirstHitTargetNum = ballController.Number;
             }
+        }
+
+        public void ResetBall(Vector3 position)
+        {
+            transform.localPosition = position;
+            IsDead = false;
+            StopBall();
+            gameObject.SetActive(true);
+        }
+
+        public void StopBall()
+        {
+            Rb.velocity = Vector3.zero;
+            Rb.angularVelocity = Vector3.zero;
+            Rb.Sleep();
         }
     }
 }

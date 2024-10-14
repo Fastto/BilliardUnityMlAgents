@@ -8,7 +8,7 @@ namespace Billiard
         public Action<BallController> OnBallCaught;
 
         void OnTriggerEnter(Collider other) {
-            if(other.TryGetComponent(out BallController ball)){
+            if(other.transform.parent.TryGetComponent(out BallController ball)){
                 OnBallCaught?.Invoke(ball);
             }
         }

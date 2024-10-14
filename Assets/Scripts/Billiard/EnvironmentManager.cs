@@ -9,10 +9,34 @@ namespace Billiard
 {
     public class EnvironmentManager : MonoBehaviour
     {
+        // enums
+        public enum WhiteBallMode
+        {
+            GAME = 0,
+            TABLE_CENTER = 1
+        }
+        
+        public enum BallsMode
+        {
+            GAME = 0,
+            RANDOM = 1
+        }
+        
+        public enum TargetMode
+        {
+            GAME = 0,
+            RANDOM = 1
+        }
+        
         // References
         public BallController m_Whiteball;
         public List<PocketController> m_Pockets;
         public List<BallController> m_Balls;
+        public List<Transform> m_StartingPositions;
+
+        public WhiteBallMode m_WhiteBallMode { get; set; }
+        public BallsMode m_BallsMode { get; set; }
+        public TargetMode m_TargetMode { get; set; } 
 
         // Configuration
         public float m_MaxShotPower = 2.0f;
@@ -28,12 +52,12 @@ namespace Billiard
         // Const
         public const float TABLE_WIDTH = 1.2f;
         public const float TABLE_HEIGHT = 2.5f;
-        
+
         private void Start()
         {
             // Storing Starting positions
-            m_WhiteBallInitPos = m_Whiteball.transform.position;
-            m_Balls.ForEach(ball => m_BallsInitPos.Add(ball.transform.position));
+            m_WhiteBallInitPos = m_Whiteball.transform.localPosition;
+            m_Balls.ForEach(ball => m_BallsInitPos.Add(ball.transform.localPosition));
         
             // Assign handler for catching the ball
             m_Pockets.ForEach(pocket => pocket.OnBallCaught += OnBallCaughtHandler);
@@ -55,23 +79,44 @@ namespace Billiard
         
             return true;
         }
-        
-          private void RestoreWhiteBall(bool placeToInitialPosition = false)
+
+        private void RestoreWhiteBall(bool placeToInitialPosition = false)
         {
-            m_Whiteball.gameObject.SetActive(true);
-            m_Whiteball.transform.position = placeToInitialPosition ? m_WhiteBallInitPos : GetSafePos();
-            m_Whiteball.IsDead = false;
-            m_Whiteball.Rb.velocity = Vector3.zero;
-            m_Whiteball.Rb.angularVelocity = Vector3.zero;
+            var initPos = m_WhiteBallMode == WhiteBallMode.GAME 
+                ? m_WhiteBallInitPos 
+                : m_StartingPositions[0].localPosition;
+
+            m_Whiteball.ResetBall(placeToInitialPosition ? initPos : GetSafePos());
         }
+        
     
         private void RestoreBall(int id, bool placeToInitialPosition = false)
         {
-            m_Balls[id].gameObject.SetActive(true);
-            m_Balls[id].transform.position = placeToInitialPosition ? m_BallsInitPos[id] : GetSafePos();
-            m_Balls[id].IsDead = false;
-            m_Balls[id].Rb.velocity = Vector3.zero;
-            m_Balls[id].Rb.angularVelocity = Vector3.zero;
+            m_Balls[id].ResetBall(placeToInitialPosition ? m_BallsInitPos[id] : GetSafePos());
+        }
+
+        private void RestoreBalls()
+        {
+            if (m_BallsMode == BallsMode.GAME)
+            {
+                for (int i = 0; i < m_Balls.Count; i++)
+                {
+                    m_Balls[i].ResetBall(m_BallsInitPos[i]);
+                }
+            }
+            else
+            {
+                var initPositions = new List<Vector3>();
+                m_StartingPositions.ForEach(pos => initPositions.Add(pos.localPosition));
+                
+                for (int i = 0; i < m_Balls.Count; i++)
+                {
+                    var id = Random.Range(1, initPositions.Count);
+                    var pos = initPositions[id];
+                    initPositions.RemoveAt(id);
+                    m_Balls[i].ResetBall(pos);
+                }
+            }
         }
 
         public void ResetTurn()
@@ -79,24 +124,17 @@ namespace Billiard
             if (m_Whiteball.IsDead) RestoreWhiteBall();
             if (m_Balls[8].IsDead) RestoreBall(8);
 
-            if ((m_Whiteball.transform.position - transform.position).magnitude > m_MaxDistanceToTable)
-                RestoreWhiteBall();
+            // if ((m_Whiteball.transform.localPosition - transform.localPosition).magnitude > m_MaxDistanceToTable)
+            //     RestoreWhiteBall();
 
-            for (int i = 0; i < m_Balls.Count; i++)
-            {
-                if(!m_Balls[i].IsDead && (m_Balls[i].transform.position - transform.position).magnitude > m_MaxDistanceToTable)
-                    RestoreBall(i);
-            }
-            
-            m_Balls.ForEach(t => {
-                t.Rb.velocity = Vector3.zero;
-                t.Rb.angularVelocity = Vector3.zero;
-                t.Rb.Sleep();
-            });
+            // for (int i = 0; i < m_Balls.Count; i++)
+            // {
+            //     if(!m_Balls[i].IsDead && (m_Balls[i].transform.localPosition - transform.localPosition).magnitude > m_MaxDistanceToTable)
+            //         RestoreBall(i);
+            // }
 
-            m_Whiteball.Rb.velocity = Vector3.zero;
-            m_Whiteball.Rb.angularVelocity = Vector3.zero;
-            m_Whiteball.Rb.Sleep();
+            m_Balls.ForEach(t => t.StopBall());
+            m_Whiteball.StopBall();
 
             m_Whiteball.FirstHitTargetNum = -1;
             m_LastTurnCaughtBalls.Clear();
@@ -106,16 +144,27 @@ namespace Billiard
         public void ResetGame()
         {
             RestoreWhiteBall(true);
-            for (int i = 0; i < m_BallsInitPos.Count; i++) 
-                RestoreBall(i, true);
-        
+            RestoreBalls();
+
             m_TargetBallNumber = 1;
         }
         
         private int DefineTarget()
         {
-            foreach (var ball in m_Balls.Where(ball => !ball.IsDead))
+            if (m_TargetMode == TargetMode.GAME)
+            {
+                foreach (var ball in m_Balls.Where(ball => !ball.IsDead))
+                    return ball.Number;
+            }
+            else
+            {
+                BallController ball;
+                do
+                {
+                    ball = m_Balls[Random.Range(0, m_Balls.Count)];
+                } while (ball.IsDead);
                 return ball.Number;
+            }
 
             throw new Exception("No available tragets");
         }
@@ -133,7 +182,7 @@ namespace Billiard
                 safePosition = new Vector3(randomX, m_WhiteBallInitPos.y, randomZ);
 
                 hitColliders =
-                    Physics.OverlapSphere(safePosition, m_Whiteball.GetComponent<SphereCollider>().radius, layerMask);
+                    Physics.OverlapSphere(safePosition, m_Whiteball.GetComponentInChildren<SphereCollider>().radius, layerMask);
             } while (hitColliders.Length > 0);
 
             return safePosition;
@@ -182,14 +231,14 @@ namespace Billiard
 
         public bool AllBallsAreOnTable()
         {
-            if ((m_Whiteball.transform.position - transform.position).magnitude > m_MaxDistanceToTable)
-                return false;
-
-            foreach (var ball in m_Balls)
-            {
-                if(!ball.IsDead && (ball.transform.position - transform.position).magnitude > m_MaxDistanceToTable)
-                    return false;
-            }
+            // if ((m_Whiteball.transform.localPosition - transform.localPosition).magnitude > m_MaxDistanceToTable)
+            //     return false;
+            //
+            // foreach (var ball in m_Balls)
+            // {
+            //     if(!ball.IsDead && (ball.transform.localPosition - transform.localPosition).magnitude > m_MaxDistanceToTable)
+            //         return false;
+            // }
             
             return true;
         }
