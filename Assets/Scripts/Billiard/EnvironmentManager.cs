@@ -41,6 +41,7 @@ namespace Billiard
         // Configuration
         public float m_MaxShotPower = 2.0f;
         public float m_MaxDistanceToTable = 5f;
+        public float m_RandomRadiusForPlacingBall = .06f;
 
         // Variables
         public List<BallController> m_LastTurnCaughtBalls { get; private set; } = new List<BallController>();
@@ -113,6 +114,8 @@ namespace Billiard
                 {
                     var id = Random.Range(1, initPositions.Count);
                     var pos = initPositions[id];
+                    pos.x += Random.Range(-m_RandomRadiusForPlacingBall, m_RandomRadiusForPlacingBall);
+                    pos.z += Random.Range(-m_RandomRadiusForPlacingBall, m_RandomRadiusForPlacingBall);
                     initPositions.RemoveAt(id);
                     m_Balls[i].ResetBall(pos);
                 }
