@@ -50,8 +50,8 @@ namespace Billiard
         private Vector3 m_WhiteBallInitPos;
 
         // Const
-        public const float TABLE_WIDTH = 1.2f;
-        public const float TABLE_HEIGHT = 2.5f;
+        public const float TABLE_WIDTH = 1.4f;
+        public const float TABLE_HEIGHT = 2.8f;
 
         private void Start()
         {

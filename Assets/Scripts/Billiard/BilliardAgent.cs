@@ -12,7 +12,7 @@ namespace Billiard
         [SerializeField] private EnvironmentManager m_Manager;
 
         // Config
-        private float _collectObservationPeriod = 0.2f;
+        private float _checkRollingFinishedPeriod = 0.2f;
         
         // Variables
         private bool _doAction = false;
@@ -38,8 +38,8 @@ namespace Billiard
             _whiteBallStartingPos = Mathf.RoundToInt(envParams.GetWithDefault("white_ball_starting_pos", 0));
             _ballsStartingPos = Mathf.RoundToInt(envParams.GetWithDefault("balls_starting_pos", 0));
             _targetMode = Mathf.RoundToInt(envParams.GetWithDefault("target_mode", 0));
+            
             _onlyOneAttempt = Mathf.RoundToInt(envParams.GetWithDefault("only_one_attempt", 0)) == 1;
-
             m_Manager.m_WhiteBallMode = (EnvironmentManager.WhiteBallMode) _whiteBallStartingPos;
             m_Manager.m_BallsMode  = (EnvironmentManager.BallsMode) _ballsStartingPos;
             m_Manager.m_TargetMode  = (EnvironmentManager.TargetMode) _targetMode;
@@ -64,28 +64,25 @@ namespace Billiard
 
         public override void CollectObservations(VectorSensor sensor)
         {
-            // the real position of ball is -1.15 .. 1.45
-            // to normalize value we have to - 0.15, result height -1.3...1.3
-            // TABLE_HEIGHT = 2.5, to make observation -1...1 we have to device TABLE_HEIGHT / 2
-            var baseHeight = (EnvironmentManager.TABLE_HEIGHT + .2f) / 2f;
-            var baseWidth = (EnvironmentManager.TABLE_WIDTH + .2f) / 2f;
+            var halfHeight = (EnvironmentManager.TABLE_HEIGHT ) / 2f;
+            var halfWidth = (EnvironmentManager.TABLE_WIDTH) / 2f;
             
-            sensor.AddObservation((m_Manager.m_Whiteball.transform.localPosition.x - 0.15f) / baseHeight);
-            sensor.AddObservation(m_Manager.m_Whiteball.transform.localPosition.z / baseWidth);
+            sensor.AddObservation(m_Manager.m_Whiteball.transform.localPosition.x / halfHeight);
+            sensor.AddObservation(m_Manager.m_Whiteball.transform.localPosition.z / halfWidth);
 
             foreach (var pocket in m_Manager.m_Pockets)
             {
-                sensor.AddObservation((pocket.transform.localPosition.x - 0.15f) / baseHeight);
-                sensor.AddObservation(pocket.transform.localPosition.z / baseWidth);
+                sensor.AddObservation(pocket.transform.localPosition.x / halfHeight);
+                sensor.AddObservation(pocket.transform.localPosition.z / halfWidth);
             }
 
             foreach (var target in m_Manager.m_Balls)
             {
                 sensor.AddObservation(target.IsDead);
                 sensor.AddObservation(target.IsDead ? 0
-                    : (target.transform.localPosition.x - 0.15f) / baseHeight);
+                    : target.transform.localPosition.x / halfHeight);
                 sensor.AddObservation(target.IsDead ? 0
-                    : target.transform.localPosition.z / baseWidth);
+                    : target.transform.localPosition.z / halfWidth);
                 
                 // instead of 1/ball_ID -separated observation for narking target
                 sensor.AddObservation(target.Number == m_Manager.m_TargetBallNumber );
@@ -140,7 +137,7 @@ namespace Billiard
                 // ************************************ Waiting rolling stopping
                 do
                 {
-                    yield return new WaitForSeconds(_collectObservationPeriod);
+                    yield return new WaitForSeconds(_checkRollingFinishedPeriod);
                     //RequestDecision();
                 } while (!m_Manager.AreAllBallsStopped() && m_Manager.AllBallsAreOnTable() && !m_Manager.m_Whiteball.IsDead);
                 
