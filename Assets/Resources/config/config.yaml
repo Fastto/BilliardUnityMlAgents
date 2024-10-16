@@ -154,7 +154,7 @@ environment_parameters:
           min_lesson_length: 20
           require_reset: true
           threshold: 0.7
-        value: 1.0
+        value: 0.9
       - name: Lesson1
         completion_criteria:
           measure: reward
@@ -165,7 +165,7 @@ environment_parameters:
           threshold: 0.8
         value: 0.5
       - name: Lesson2
-        value: 0.05
+        value: 0.1
 
   legal_shot_ball_caught_reward:
     curriculum:
@@ -177,7 +177,7 @@ environment_parameters:
           min_lesson_length: 20
           require_reset: true
           threshold: 0.7
-        value: 0.0
+        value: 0.1
       - name: Lesson1
         completion_criteria:
           measure: reward
@@ -185,7 +185,7 @@ environment_parameters:
           signal_smoothing: true
           min_lesson_length: 20
           require_reset: true
-          threshold: 0.8
+          threshold: 0.5
         value: 0.5
       - name: Lesson2
         value: 0.1
@@ -211,7 +211,7 @@ environment_parameters:
           threshold: 0.8
         value: -0.1
       - name: Lesson2
-        value: -0.1
+        value: -0.2
 
   defeat_penalty:
     curriculum:
@@ -235,4 +235,27 @@ environment_parameters:
         value: 0.0
       - name: Lesson2
         value: -1.0
+        
+  balls_quantity:
+    curriculum:
+      - name: Lesson0
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.7
+        value: 3
+      - name: Lesson1
+        completion_criteria:
+          measure: reward
+          behavior: BilliyardBehavior
+          signal_smoothing: true
+          min_lesson_length: 20
+          require_reset: true
+          threshold: 0.8
+        value: 6
+      - name: Lesson2
+        value: 9
         

@@ -40,8 +40,6 @@ namespace Billiard
 
         // Configuration
         public float m_MaxShotPower = 2.0f;
-        public float m_MaxDistanceToTable = 5f;
-        public float m_RandomRadiusForPlacingBall = .06f;
 
         // Variables
         public List<BallController> m_LastTurnCaughtBalls { get; private set; } = new List<BallController>();
@@ -52,7 +50,7 @@ namespace Billiard
 
         // Const
         public const float TABLE_WIDTH = 1.4f;
-        public const float TABLE_HEIGHT = 2.8f;
+        public const float TABLE_LENGTH = 2.8f;
 
         private void Start()
         {
@@ -90,51 +88,29 @@ namespace Billiard
             m_Whiteball.ResetBall(placeToInitialPosition ? initPos : GetSafePos());
         }
         
-    
         private void RestoreBall(int id, bool placeToInitialPosition = false)
         {
             m_Balls[id].ResetBall(placeToInitialPosition ? m_BallsInitPos[id] : GetSafePos());
         }
 
-        private void RestoreBalls()
+        private void RestoreBalls(int qty = 9)
         {
-            if (m_BallsMode == BallsMode.GAME)
+            for (int i = 0; i < qty; i++)
             {
-                for (int i = 0; i < m_Balls.Count; i++)
-                {
-                    m_Balls[i].ResetBall(m_BallsInitPos[i]);
-                }
+                m_Balls[i].ResetBall(m_BallsMode == BallsMode.GAME ? m_BallsInitPos[i] : GetSafePos());
             }
-            else
-            {
-                var initPositions = new List<Vector3>();
-                m_StartingPositions.ForEach(pos => initPositions.Add(pos.localPosition));
-                
-                for (int i = 0; i < m_Balls.Count; i++)
-                {
-                    var id = Random.Range(1, initPositions.Count);
-                    var pos = initPositions[id];
-                    pos.x += Random.Range(-m_RandomRadiusForPlacingBall, m_RandomRadiusForPlacingBall);
-                    pos.z += Random.Range(-m_RandomRadiusForPlacingBall, m_RandomRadiusForPlacingBall);
-                    initPositions.RemoveAt(id);
-                    m_Balls[i].ResetBall(pos);
-                }
-            }
+
+            if (qty >= 9) return;
+            
+            for (int i = qty-1; i < 9; i++) 
+                OnBallCaughtHandler(m_Balls[i]);
+
         }
 
         public void ResetTurn()
         {
             if (m_Whiteball.IsDead) RestoreWhiteBall();
             if (m_Balls[8].IsDead) RestoreBall(8);
-
-            // if ((m_Whiteball.transform.localPosition - transform.localPosition).magnitude > m_MaxDistanceToTable)
-            //     RestoreWhiteBall();
-
-            // for (int i = 0; i < m_Balls.Count; i++)
-            // {
-            //     if(!m_Balls[i].IsDead && (m_Balls[i].transform.localPosition - transform.localPosition).magnitude > m_MaxDistanceToTable)
-            //         RestoreBall(i);
-            // }
 
             m_Balls.ForEach(t => t.StopBall());
             m_Whiteball.StopBall();
@@ -144,12 +120,12 @@ namespace Billiard
             m_TargetBallNumber = DefineTarget();
         }
 
-        public void ResetGame()
+        public void ResetGame(int ballsQuantity = 9)
         {
-            RestoreWhiteBall(true);
-            RestoreBalls();
+            RestoreWhiteBall(false);
+            RestoreBalls(ballsQuantity);
 
-            m_TargetBallNumber = 1;
+            m_TargetBallNumber = DefineTarget();
         }
         
         private int DefineTarget()
@@ -180,8 +156,8 @@ namespace Billiard
 
             do
             {
-                float randomX = Random.Range(-0.5f, 0.5f);
-                float randomZ = Random.Range(-1.3f, 1.0f);
+                float randomZ = Random.Range(-0.4f, 0.4f);
+                float randomX = Random.Range(-1.0f, 1.0f);
                 safePosition = new Vector3(randomX, m_WhiteBallInitPos.y, randomZ);
 
                 hitColliders =
@@ -231,19 +207,6 @@ namespace Billiard
             power *= m_MaxShotPower;
             m_Whiteball.Rb.AddForce(direction * power, ForceMode.VelocityChange);
         }
-
-        public bool AllBallsAreOnTable()
-        {
-            // if ((m_Whiteball.transform.localPosition - transform.localPosition).magnitude > m_MaxDistanceToTable)
-            //     return false;
-            //
-            // foreach (var ball in m_Balls)
-            // {
-            //     if(!ball.IsDead && (ball.transform.localPosition - transform.localPosition).magnitude > m_MaxDistanceToTable)
-            //         return false;
-            // }
-            
-            return true;
-        }
+        
     }
 }

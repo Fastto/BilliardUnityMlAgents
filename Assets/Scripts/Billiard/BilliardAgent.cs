@@ -22,6 +22,7 @@ namespace Billiard
         private int _whiteBallStartingPos;
         private int _ballsStartingPos;
         private int _targetMode;
+        private int _ballsQuantity;
         private bool _onlyOneAttempt;
         
         private float _victoryReward; //9th ball cought by legal shot
@@ -38,6 +39,7 @@ namespace Billiard
             _whiteBallStartingPos = Mathf.RoundToInt(envParams.GetWithDefault("white_ball_starting_pos", 0));
             _ballsStartingPos = Mathf.RoundToInt(envParams.GetWithDefault("balls_starting_pos", 0));
             _targetMode = Mathf.RoundToInt(envParams.GetWithDefault("target_mode", 0));
+            _ballsQuantity = Mathf.RoundToInt(envParams.GetWithDefault("balls_quantity", 9));
             
             _onlyOneAttempt = Mathf.RoundToInt(envParams.GetWithDefault("only_one_attempt", 0)) == 1;
             m_Manager.m_WhiteBallMode = (EnvironmentManager.WhiteBallMode) _whiteBallStartingPos;
@@ -56,7 +58,7 @@ namespace Billiard
             if (!_resetedOnStart)
             {
                 _resetedOnStart = true;
-                m_Manager.ResetGame();
+                m_Manager.ResetGame(_ballsQuantity);
             }
             
             StartCoroutine(EpisodeCycle());
@@ -64,29 +66,70 @@ namespace Billiard
 
         public override void CollectObservations(VectorSensor sensor)
         {
-            var halfHeight = (EnvironmentManager.TABLE_HEIGHT ) / 2f;
-            var halfWidth = (EnvironmentManager.TABLE_WIDTH) / 2f;
             
-            sensor.AddObservation(m_Manager.m_Whiteball.transform.localPosition.x / halfHeight);
-            sensor.AddObservation(m_Manager.m_Whiteball.transform.localPosition.z / halfWidth);
+            // COORDINATES APPROACH
+            // var halfHeight = (EnvironmentManager.TABLE_LENGTH ) / 2f;
+            // var halfWidth = (EnvironmentManager.TABLE_WIDTH) / 2f;
+            //
+            // sensor.AddObservation(m_Manager.m_Whiteball.transform.localPosition.x / halfHeight);
+            // sensor.AddObservation(m_Manager.m_Whiteball.transform.localPosition.z / halfWidth);
+            //
+            // foreach (var pocket in m_Manager.m_Pockets)
+            // {
+            //     sensor.AddObservation(pocket.transform.localPosition.x / halfHeight);
+            //     sensor.AddObservation(pocket.transform.localPosition.z / halfWidth);
+            // }
+            //
+            // foreach (var target in m_Manager.m_Balls)
+            // {
+            //     sensor.AddObservation(target.IsDead);
+            //     sensor.AddObservation(target.IsDead ? 0
+            //         : target.transform.localPosition.x / halfHeight);
+            //     sensor.AddObservation(target.IsDead ? 0
+            //         : target.transform.localPosition.z / halfWidth);
+            //     
+            //     // instead of 1/ball_ID -separated observation for narking target
+            //     sensor.AddObservation(target.Number == m_Manager.m_TargetBallNumber );
+            // }
+            
+            // DIRECTIONS APPROACH
+            
 
             foreach (var pocket in m_Manager.m_Pockets)
             {
-                sensor.AddObservation(pocket.transform.localPosition.x / halfHeight);
-                sensor.AddObservation(pocket.transform.localPosition.z / halfWidth);
+                var dir = (pocket.transform.localPosition - m_Manager.m_Whiteball.transform.localPosition);
+                sensor.AddObservation(dir.normalized.x);
+                sensor.AddObservation(dir.normalized.y);
+                sensor.AddObservation((dir.magnitude / EnvironmentManager.TABLE_LENGTH) - 1f);
             }
 
             foreach (var target in m_Manager.m_Balls)
             {
-                sensor.AddObservation(target.IsDead);
-                sensor.AddObservation(target.IsDead ? 0
-                    : target.transform.localPosition.x / halfHeight);
-                sensor.AddObservation(target.IsDead ? 0
-                    : target.transform.localPosition.z / halfWidth);
+                if (target.IsDead)
+                {
+                    sensor.AddObservation(0);
+                    sensor.AddObservation(0);
+                    sensor.AddObservation(0);
+                    continue;
+                }
                 
-                // instead of 1/ball_ID -separated observation for narking target
-                sensor.AddObservation(target.Number == m_Manager.m_TargetBallNumber );
+                var dir = (target.transform.localPosition - m_Manager.m_Whiteball.transform.localPosition);
+                sensor.AddObservation(dir.normalized.x);
+                sensor.AddObservation(dir.normalized.y);
+                sensor.AddObservation((dir.magnitude / EnvironmentManager.TABLE_LENGTH) - 1f);
             }
+            
+            foreach (var target in m_Manager.m_Balls)
+            {
+                if (m_Manager.m_TargetBallNumber == target.Number)
+                {
+                    var dir = (target.transform.localPosition - m_Manager.m_Whiteball.transform.localPosition);
+                    sensor.AddObservation(dir.normalized.x);
+                    sensor.AddObservation(dir.normalized.y);
+                    sensor.AddObservation((dir.magnitude / EnvironmentManager.TABLE_LENGTH) - 1f);
+                }
+            }
+            
 
         }
 
@@ -139,16 +182,10 @@ namespace Billiard
                 {
                     yield return new WaitForSeconds(_checkRollingFinishedPeriod);
                     //RequestDecision();
-                } while (!m_Manager.AreAllBallsStopped() && m_Manager.AllBallsAreOnTable() && !m_Manager.m_Whiteball.IsDead);
+                } while (!m_Manager.AreAllBallsStopped() && !m_Manager.m_Whiteball.IsDead);
                 
                 // ************************************ Stop All movements
                 m_Manager.SleepBalls();
-
-                if (!m_Manager.AllBallsAreOnTable())
-                {
-                    SetReward(_illegalShotPenalty);
-                    break;
-                }
 
                 // ************************************ Results evaluation 
 
@@ -169,7 +206,7 @@ namespace Billiard
                     {
                         // Game won
                         SetReward(_victoryReward);
-                        m_Manager.ResetGame();
+                        m_Manager.ResetGame(_ballsQuantity);
                         break;
                     }
                     
@@ -184,7 +221,7 @@ namespace Billiard
             
             if (_onlyOneAttempt)
             {
-                m_Manager.ResetGame();
+                m_Manager.ResetGame(_ballsQuantity);
             }
             
             EndEpisode();

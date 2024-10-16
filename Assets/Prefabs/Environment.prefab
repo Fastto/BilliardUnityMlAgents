@@ -3320,6 +3320,7 @@ MonoBehaviour:
   - {fileID: 8766448952759753468}
   m_MaxShotPower: 3
   m_MaxDistanceToTable: 5
+  m_RandomRadiusForPlacingBall: 0.1
 --- !u!1 &6419055134931452920
 GameObject:
   m_ObjectHideFlags: 0
@@ -4728,7 +4729,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 50
+    VectorObservationSize: 48
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 3
