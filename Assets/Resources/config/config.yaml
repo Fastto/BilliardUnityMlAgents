@@ -12,7 +12,7 @@ behaviors:
       learning_rate_schedule: linear # Linear decay of the learning rate
 
     network_settings:
-      hidden_units: 256            # Number of neurons in the hidden layers
+      hidden_units: 64            # Number of neurons in the hidden layers
       num_layers: 2                # Number of hidden layers
 
     reward_signals:
@@ -22,7 +22,7 @@ behaviors:
 
     max_steps: 50000000            # Total number of training steps
     time_horizon: 64               # Time horizon for reward estimation
-    summary_freq: 5000            # Frequency of recording training statistics
+    summary_freq: 1000            # Frequency of recording training statistics
     keep_checkpoints: 5            # Number of checkpoints to keep
 
 

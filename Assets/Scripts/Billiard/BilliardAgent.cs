@@ -32,7 +32,7 @@ namespace Billiard
         private float _illegalShotPenalty; // penalty for illegal shot
  
 
-        public override void Initialize()
+        public  void LoadParameters()
         {
             EnvironmentParameters envParams = Academy.Instance.EnvironmentParameters;
 
@@ -55,6 +55,8 @@ namespace Billiard
 
         public override void OnEpisodeBegin()
         {
+            LoadParameters();
+            
             if (!_resetedOnStart)
             {
                 _resetedOnStart = true;
@@ -99,7 +101,7 @@ namespace Billiard
             {
                 var dir = (pocket.transform.localPosition - m_Manager.m_Whiteball.transform.localPosition);
                 sensor.AddObservation(dir.normalized.x);
-                sensor.AddObservation(dir.normalized.y);
+                sensor.AddObservation(dir.normalized.z);
                 sensor.AddObservation((dir.magnitude / EnvironmentManager.TABLE_LENGTH) - 1f);
             }
 
@@ -115,7 +117,7 @@ namespace Billiard
                 
                 var dir = (target.transform.localPosition - m_Manager.m_Whiteball.transform.localPosition);
                 sensor.AddObservation(dir.normalized.x);
-                sensor.AddObservation(dir.normalized.y);
+                sensor.AddObservation(dir.normalized.z);
                 sensor.AddObservation((dir.magnitude / EnvironmentManager.TABLE_LENGTH) - 1f);
             }
             
@@ -125,7 +127,7 @@ namespace Billiard
                 {
                     var dir = (target.transform.localPosition - m_Manager.m_Whiteball.transform.localPosition);
                     sensor.AddObservation(dir.normalized.x);
-                    sensor.AddObservation(dir.normalized.y);
+                    sensor.AddObservation(dir.normalized.z);
                     sensor.AddObservation((dir.magnitude / EnvironmentManager.TABLE_LENGTH) - 1f);
                 }
             }
