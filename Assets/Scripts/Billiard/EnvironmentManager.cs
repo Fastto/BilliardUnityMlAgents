@@ -95,8 +95,7 @@ namespace Billiard
 
         private void RestoreBalls(int qty = 9)
         {
-            
-            for (int i = 0; i < qty; i++)
+            for (int i = 0; i < 9; i++)
             {
                 m_Balls[i].HideBall();
             }

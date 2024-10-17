@@ -42,7 +42,6 @@ namespace Billiard
         
         public void HideBall()
         {
-
             IsDead = true;
             gameObject.SetActive(false);
         }
