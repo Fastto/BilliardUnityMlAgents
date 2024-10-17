@@ -95,15 +95,32 @@ namespace Billiard
 
         private void RestoreBalls(int qty = 9)
         {
+            
             for (int i = 0; i < qty; i++)
             {
-                m_Balls[i].ResetBall(m_BallsMode == BallsMode.GAME ? m_BallsInitPos[i] : GetSafePos());
+                m_Balls[i].HideBall();
             }
 
-            if (qty >= 9) return;
-            
-            for (int i = qty-1; i < 9; i++) 
-                OnBallCaughtHandler(m_Balls[i]);
+            if (qty == 9)
+            {
+                for (int i = 0; i < qty; i++)
+                {
+                    m_Balls[i].ResetBall(m_BallsMode == BallsMode.GAME ? m_BallsInitPos[i] : GetSafePos());
+                }
+            }
+            else
+            {
+                int enabled = 0;
+                while (enabled < qty)
+                {
+                    int ind = Random.Range(0, 9);
+                    if (m_Balls[ind].IsDead)
+                    {
+                        enabled++;
+                        m_Balls[ind].ResetBall(m_BallsMode == BallsMode.GAME ? m_BallsInitPos[ind] : GetSafePos());
+                    }
+                }
+            }
 
         }
 

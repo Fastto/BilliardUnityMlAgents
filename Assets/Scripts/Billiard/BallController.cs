@@ -39,6 +39,13 @@ namespace Billiard
             StopBall();
             gameObject.SetActive(true);
         }
+        
+        public void HideBall()
+        {
+
+            IsDead = true;
+            gameObject.SetActive(false);
+        }
 
         public void StopBall()
         {

@@ -12,8 +12,8 @@ behaviors:
       learning_rate_schedule: linear # Linear decay of the learning rate
 
     network_settings:
-      hidden_units: 64            # Number of neurons in the hidden layers
-      num_layers: 2                # Number of hidden layers
+      hidden_units: 128            # Number of neurons in the hidden layers
+      num_layers: 3                # Number of hidden layers
 
     reward_signals:
       extrinsic:
@@ -21,7 +21,7 @@ behaviors:
         strength: 1.0              # Reward weight
 
     max_steps: 50000000            # Total number of training steps
-    time_horizon: 64               # Time horizon for reward estimation
+    time_horizon: 16               # Time horizon for reward estimation
     summary_freq: 1000            # Frequency of recording training statistics
     keep_checkpoints: 5            # Number of checkpoints to keep
 
@@ -36,7 +36,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 1 
@@ -45,7 +45,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.8
         value: 1
@@ -59,7 +59,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 1
@@ -68,7 +68,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.8
         value: 2
@@ -82,7 +82,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 1
@@ -91,7 +91,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.8
         value: 1
@@ -105,7 +105,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 1
@@ -114,7 +114,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.8
         value: 1
@@ -128,7 +128,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 0.0
@@ -137,7 +137,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.8
         value: 0.0
@@ -151,7 +151,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 0.9
@@ -160,7 +160,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.8
         value: 0.5
@@ -174,7 +174,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 0.1
@@ -183,7 +183,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.5
         value: 0.5
@@ -197,7 +197,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 0.0
@@ -206,7 +206,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.8
         value: -0.1
@@ -220,7 +220,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 0.0
@@ -229,7 +229,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.8
         value: 0.0
@@ -243,7 +243,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.7
         value: 3
@@ -252,7 +252,7 @@ environment_parameters:
           measure: reward
           behavior: BilliyardBehavior
           signal_smoothing: true
-          min_lesson_length: 20
+          min_lesson_length: 50
           require_reset: true
           threshold: 0.8
         value: 6
