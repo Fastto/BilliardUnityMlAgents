@@ -23,6 +23,18 @@ namespace Billiard
         {
             return isWhite_;
         }
+        
+        void FixedUpdate()
+        {
+            // var rollingFriction = 0.1f;
+            // // Check if the ball is moving but not rolling
+            // if (Rb.velocity.magnitude > 0.1f && Rb.angularVelocity.magnitude < Rb.velocity.magnitude)
+            // {
+            //     // Apply rolling friction to simulate realistic rolling
+            //     Vector3 rollingTorque = Vector3.Cross(Rb.velocity.normalized, Vector3.up) * rollingFriction;
+            //     Rb.AddTorque(rollingTorque, ForceMode.Force);
+            // }
+        }
 
         private void OnCollisionEnter(Collision other) {
             if(isWhite_ && FirstHitTargetNum == -1 && other.gameObject.tag == "targetBall")

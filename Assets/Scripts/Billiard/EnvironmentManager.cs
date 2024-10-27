@@ -220,8 +220,27 @@ namespace Billiard
 
         public void Shot(Vector3 direction, float power)
         {
-            power *= m_MaxShotPower;
+            // power *= m_MaxShotPower;
+            // m_Whiteball.Rb.AddForce(direction * power, ForceMode.VelocityChange);
+            
+            // Apply forward force based on direction and power
+            var rollingFriction = 0.1f;
+            // m_Whiteball.Rb.AddForce(direction * power, ForceMode.VelocityChange);
+            //
+            // // Calculate the initial torque to start the rolling effect
+            // Vector3 torque = Vector3.Cross(Vector3.down, direction).normalized * power * rollingFriction;
+            // m_Whiteball.Rb.AddTorque(torque, ForceMode.VelocityChange);
+            
+            
+            // Normalize direction to ensure the force is always applied consistently
+            direction = direction.normalized;
+            
+            // Apply forward force based on direction and power
             m_Whiteball.Rb.AddForce(direction * power, ForceMode.VelocityChange);
+            
+            // Calculate torque to ensure forward rolling in the same direction as movement
+            Vector3 torque = direction * power * rollingFriction;
+            m_Whiteball.Rb.AddTorque(torque, ForceMode.VelocityChange);
         }
         
     }
